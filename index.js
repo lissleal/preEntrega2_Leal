@@ -1,5 +1,4 @@
-const fs = require ("fs");
-const { json } = require("stream/consumers");
+const fs = require ("fs").promises
 
 class ProductManager {
     constructor(){
@@ -7,7 +6,7 @@ class ProductManager {
         this.products = [];
     }
     readProduct = async () => {
-        let respuesta = await fs.promises.readFile(this.path, "utf-8")
+        let respuesta = await fs.readFile(this.path, "utf-8")
         return JSON.parse(respuesta) 
     }
 
@@ -16,7 +15,7 @@ class ProductManager {
         console.log(productosEnCarro)
     }
 
-    addProduct = async (title, description, price, thumbnail, code, stock) =>{
+    addProduct = async (title, description, price, thumbnail, code, stock) => {
 
         const codigoExiste = this.products.some((producto) => producto.code === code)
             if(codigoExiste){
@@ -39,7 +38,7 @@ class ProductManager {
                         console.log(`El producto ${producto.title} no se añadio porque al menos uno de sus campos esta vacio`)
                     }else{
                         this.products.push(producto)
-                        await fs.promises.writeFile(this.path, JSON.stringify(this.products))
+                        await fs.writeFile(this.path, JSON.stringify(this.products))
                         console.log(`El producto ${producto.title} ha sido añadido correctamente`)
                     }
             }
@@ -56,14 +55,15 @@ class ProductManager {
     deleteProductById = async (id) => {
         let productosEnCarro = await this.readProduct()
         const carroSinProducto = productosEnCarro.filter((producto) => producto.id != id)
-        await fs.promises.writeFile(this.path, JSON.stringify(carroSinProducto))
+        await fs.writeFile(this.path, JSON.stringify(carroSinProducto))
         console.log("Producto Eliminado")
     }
     updateProduct = async ({id, ...producto}) => {
         await this.deleteProductById(id)
         let productoOld = await this.readProduct()
         let modificado = [{...producto, id}, ...productoOld]
-        await fs.promises.writeFile(this.path, JSON.stringify(modificado))
+        await fs.writeFile(this.path, JSON.stringify(modificado))
+        console.log("producto modificado")
     }
 }
 
@@ -72,14 +72,24 @@ class ProductManager {
 
 const productos = new ProductManager
 
-
-// productos.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
-
-// productos.addProduct("producto prueba2", "Este es un producto prueba2", 200, "Sin imagen", "abc124", 25);
-
-// productos.addProduct("producto prueba3", "Este es un producto prueba2", 200, "Sin imagen", "abc125", 25);
+//productos.addProduct("producto prueba 1", "Este es un producto prueba 1", 200, "Sin imagen", "abc123", 25)
+// productos.addProduct("producto prueba 2", "Este es un producto prueba 2", 400, "Sin imagen", "abc124", 25)
+// productos.addProduct("producto prueba 3", "Este es un producto prueba 3", 600, "Sin imagen", "abc125", 25)
 
 
-// productos.updateProduct({"title":"producto prueba8","description":"Este es un producto prueba8","price":800,"thumbnail":"Sin imagen","code":"abc128","stock":25,"id":2})
+//productos.getProduct()
 
-productos.getProduct()
+//productos.getProductById(1)
+//productos.getProductById(8)
+
+// productos.updateProduct({
+//     "title":"producto prueba 1",
+//     "description":"Cambio en el producto 1",
+//     "price":1000,
+//     "thumbnail":"Sin imagen",
+//     "code":"abc123",
+//     "stock":25,
+//     "id":1
+// })
+
+//productos.deleteProductById(1)
